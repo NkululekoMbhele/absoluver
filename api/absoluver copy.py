@@ -1,46 +1,30 @@
 # Author: Nkululeko Mbhele
-# Date: 05 September 2022
-import re
-
+# Date: 10 September 2022
+import re, string
+import nltk
+from nltk.tokenize import word_tokenize
 signs = ["+", "-", "*", "/"]
 
 def get_expression_array(equation):
-    signs = ["+", "-", "*", "/" ,"=", "(", ")"]
-    co_signs = ["+", "-"]
-    position = 0
-    array = []
-    for i, char in enumerate(equation):
-        if not (char.isdigit() or char.isalpha()):
-            if len(equation[position:i]) != 0 or len(char) != 0:
-                if i != 0 and (equation[position-1] in signs) and (equation[position-1]) in co_signs and (equation[position-2]).isdigit():
-                    array.append(equation[position-1:i])
-                elif i != 0 and (equation[position-1] in signs) and (equation[position-1]) in co_signs and (equation[position-2]) == "=":
-                    array.append(equation[position-1:i])
-                else:
-                    array.append(equation[position:i])
-                if i != 0 and equation[i-1] != '=':
-                    array.append(char)
-                else:
-                    array.append(char)
-            position = i + 1
-            if not any(x in equation[position:len(equation)] for x in signs):
-                if len(equation[position:i]) != 0 or len(char) != 0:
-                    if (equation[position-1]) in co_signs and (equation[position-2]) == "=":
-                        array.append(equation[position-1:len(equation)])
-                    else:
-                        array.append(equation[position:len(equation)])
-    while("" in array):
-        array.remove("")
-    new_array = array
-    for x in range(len(new_array)-1):
-        operations = ["-", "+"]
-        if new_array[x-1] == new_array[x]:
-            new_array.pop(x)
-        if new_array[x] in operations and new_array[x+1].isdigit():
-            new_array[x+1] = str(new_array[x]) + str(new_array[x+1])
-        if len(new_array[x]) > 1 and new_array[x][0] in operations:
-            new_array[x] = str(eval(new_array[x]))
-    return array
+    trimmed = equation.replace(" ", "")
+    spaced_equation = re.sub("[\(\+\-\)=]",  lambda operator: " " + operator[0] + " ", trimmed)
+    tokenized_equation =  word_tokenize(spaced_equation)
+    return tokenized_equation
+
+def fix_signs(tokens):
+    operator_sign = ["+", "-"]
+    signs = ["("]
+    for index, token in enumerate(tokens):
+        if token == "-" and index == 0 and tokens[index + 1] != "(":
+            tokens[index + 1] = token + tokens[index + 1]
+            tokens.pop(index)
+        if token == "+" and str(tokens[index + 1])[0] == "-":
+            tokens[index] = "-"
+            tokens[index+1] = str(tokens[index + 1])[1:]
+        if token == "-" and str(tokens[index + 1])[0] == "-":
+            tokens[index] = "+"
+            tokens[index+1] = str(tokens[index + 1])[1:]
+    return tokens
 
 def simplification(tokens):
     signs = ["+", "-", "*", "/" ,"=", "(", ")" ]
@@ -103,7 +87,6 @@ def parenthesis_simplification(tokens):
         if value == ")":
             tokens.remove(value)
     return tokens
-
 
 #Steps
 def simple_expression(tokens):
@@ -221,7 +204,6 @@ def upper_level_simplication(tokens):
     print(tokens)
     return used_tokens
 
-
 # Expression Classifier
 def expression_classifier(tokens):
     # Types
@@ -293,14 +275,6 @@ def expression_classifier(tokens):
         print("multi case")
         return 4
     
-    # print(constants)
-    # print(variables)
-    # print(parenthesis_pair)
-
-
-def clean_tokens(tokens):
-    pass
-
 
 def parenthesis(tokens):
     coefficient = 1
@@ -323,6 +297,8 @@ def parenthesis(tokens):
 def evaluate_parenthesis(tokens):
     signs = ["+", "-", "*", "/"]
     eval_tokens, coefficient, position = parenthesis(tokens)
+    if coefficient in signs:
+        coefficient = '1'
     eval_tokens.remove("(")
     eval_tokens.remove(")")
     is_variable = False
@@ -332,11 +308,9 @@ def evaluate_parenthesis(tokens):
         if value not in signs and not value.isdigit():
             for char in value:
                 if char.isalpha():
-                    is_variable = True
-                    variable = char
-                    new_value = value.replace(variable, "")
+                    new_value = value.replace(char, "")
                     new_variable_coeffient = eval(f"{coefficient} * {new_value}")
-                    new_tokens.append(f"{new_variable_coeffient}{variable}")
+                    new_tokens.append(f"{new_variable_coeffient}{char}")
 
         elif str(value).isdigit():
             new_tokens.append(eval(f"{coefficient} * {value}"))
@@ -349,26 +323,46 @@ def evaluate_parenthesis(tokens):
     else:
         tokens[position[0]-1:position[1]] = new_tokens
 
-    print(tokens)
-    print("Move")
-    print(eval_tokens)
-    print("Move")
     print(new_tokens)
+    print("Here")
+    print(tokens)
+    evaluated_tokens = fix_signs(tokens)
+    print(evaluated_tokens)
+    string = ''.join(str(item) for item in evaluated_tokens)
+    parenthesis_check = re.findall(r'\((.*?)\)', string)
+    if (len(parenthesis_check) != 0):
+        evaluate_parenthesis(evaluated_tokens)
+    else:
+        return evaluated_tokens
 
+    
+
+def numerical_eval(tokens):
+    signs = ["+", "-", "*", "/"]
+    start_pos = 0
+    string = ""
+    for index, token in enumerate(tokens):
+         # left side
+        if (index < tokens.index("=")) and value not in signs:
+            #check if its a signs
+            print("Left")
+            #check if constant
+            if str(value).isdigit():
+                constants[0] += 1
+        # right side
+    print(string)
 
 if __name__ == "__main__":
-    equation = "-6(5x + 2) = 6 + 1+ (5)"
-    # equation = "-2(2x - 2) + 2 = -2 + 2"
-    def match_evaluator(match):
-        print(match.group())
-        return lambda operator: " " + operator[0] + " "
-    trimmed = equation.replace(" ", "")
-    string = re.sub("[\(\+\-\)=]",  lambda operator: " " + operator[0] + " ", trimmed)
-    string = re.sub("^\S",  "", string)
-    string.pop(2)
-    # print(parenthesis(tokens))
-    # tokens = get_expression_array(trimmed)
-    # print(tokens)   
+    equation = "-6(5x + 2) = 6 + 1+ 5"
+    tokens = get_expression_array(equation)
+    fixed_tokens = fix_signs(tokens)
     # print(tokens)
-    # evaluate_parenthesis(tokens)
-    # expression_classifier(tokens)
+    print(fixed_tokens)
+    string = ''.join(fixed_tokens)
+    parenthesis_check = re.findall(r'\((.*?)\)', string)
+    if (len(parenthesis_check) != 0):
+        print(parenthesis_check[0])
+    print(evaluate_parenthesis(tokens))
+    # numerical_eval(tokens)
+
+    
