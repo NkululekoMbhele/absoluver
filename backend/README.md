@@ -1,46 +1,73 @@
-# Getting Started with Create React App
+# Absoluver Flask Backend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The backend flask app is an api that allows get requests with equation as params and send bank a json data with steps of solving the equation.
 
-## Available Scripts
+Move to the backend directory and run the following commands:
 
-In the project directory, you can run:
+## Creating a virtual environment (Windows)
 
-### `npm start`
+Initialiaze the environment folder:
+```
+$ virtualenv.exe venv
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+If virtualenv is not found run
+```
+$ pip install virtualenv.exe
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Activate the virtual environment:
+```
+$ source venv/Scripts/activate
+```
 
-### `npm test`
+## Creating a virtual environment (MACOS)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Initialiaze the environment folder:
+```
+$ virtualenv venv
+```
 
-### `npm run build`
+If virtualenv is not found run
+```
+$ pip install virtualenv
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Activate the virtual environment:
+```
+$ source venv/bin/activate
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Installation of dependencies
 
-### `npm run eject`
+Install dependancies with pip:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
+$ pip install -r requirements.txt
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Running the backend
 
-## Learn More
+Run the following command:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+$ python main.py
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+## Flask Application Structure 
+```
+.
+|──── main.py
+|──── requirements.txt
+|──── README.md
+
+
+
+##Flask settings
+DEBUG = True  # True/False
+TESTING = False
