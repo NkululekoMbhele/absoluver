@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react';
-import logo from './assets/logo.svg';
 
 function App() {
   const [solution, setSolution] = useState({})
@@ -42,7 +41,7 @@ function App() {
     <div className="w-screen py-8 bg-gradient-to-t from-blue-300 via-green-200 to-yellow-300">
         <div className="container flex flex-col items-center w-full">
           <div className="grid w-full header place-items-center">
-            <img src={logo} alt="logo" />
+            <img src="https://firebasestorage.googleapis.com/v0/b/nkululekodotio-2b22e.appspot.com/o/absoluver%2Flogo.svg?alt=media&token=bce21cd0-c32a-4a7c-b5f6-5ab68c3080b2" alt="logo" />
             <h1 className="pt-4 text-4xl font-bold text-blue-600">ABSOLUVER</h1>
             <p className="pt-1 text-sm font-light tracking-wider text-blue-600">ABSOLUTE EQUATION SOLVER</p>
           </div>
