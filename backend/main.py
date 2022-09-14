@@ -19,24 +19,17 @@ def index():
     solution_steps = []
     data = request.data
     equation = request.args.get('equation')
-    tokens = get_expression_array(equation)
-    step, sample_tokens, new_tokens = simple_expression(tokens)
-    solution_steps.append({
-        'step': step, 'sample': ' '.join(str(token) for token in sample_tokens), 'new_equation': ' '.join(str(token) for token in new_tokens)
-    })
-    step2, sample_tokens2, new_tokens2 = divide_expression(tokens)
-    solution_steps.append({
-        'step': step2, 'sample': ' '.join(str(token) for token in sample_tokens2), 'new_equation': ' '.join(str(token) for token in new_tokens2)
-    })
     print(equation)
-
-    return json.dumps({'steps': solution_steps})
+    instance = Absoluver(equation)
+    instance.run()
+    solution_steps = instance.solution_steps
+    return json.dumps({'steps': solution_steps, 'variable': instance.variable, 'equation': equation})
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
     instance = Absoluver("2x + 3 = 4")
     print(instance.equation_tokenization())
-    return json.dumps({'steps': instance.equation_tokenization()})
+    return json.dumps({steps : instance.equation_tokenization()})
 
 class Absoluver():
     def __init__(self, equation):
@@ -70,12 +63,13 @@ class Absoluver():
         #   ""
         # } ...
         self.solution_steps = []
-        self.step_count = 0
+        self.step_count = 1
 
         # x, y, z etc
         self.variable = ""
 
         # States: []
+        # solution_case = x = b 
         # base_case -> ax = c -> 0 if variables = 1 and 0 and constants 1
         # simple_base -> ax + b = c -> 1 if variables = 1
         # two_sided_variables -> ax + b = cx + d -> 2 if variables both > 1
@@ -91,11 +85,22 @@ class Absoluver():
         # Continously updated
         self.tokens = []
 
+        # Error handling
+        self.error_message = ""
+
+    # Fix expression 
     def expression_tokenization(self, expression):
         trimmed = expression.replace(" ", "")
-        spaced_equation = re.sub("[\(\+\-\)=\\]",  lambda operator: " " + operator[0] + " ", trimmed)
+        spaced_equation = ""
+        for index, value in enumerate(expression):
+            if value in self.all_operators:
+                spaced_equation += value
+                spaced_equation += " "
+            else:
+                spaced_equation += value
         tokenized_equation =  word_tokenize(spaced_equation)
         return tokenized_equation
+
     # Create tokens(string array) from the equation e.g "2x + 3 = 1" --> ["2x", "+", "3", "=", "1"]
     def equation_tokenization(self):
         trimmed = self.equation.replace(" ", "")
@@ -119,13 +124,20 @@ class Absoluver():
                 self.tokens[index+1] = str(self.tokens[index + 1])[1:]
         
         # fix no signs ['2y', '-7', '=', '6'] ---> ['2y', '-', '7', '=', '6']
-        for index, token in enumerate(self.tokens):
-            if token.isdigit() or token not in self.all_operators and index < len(self.tokens) - 1:
-                if self.tokens[index+1] not in self.all_operators:
-                    if self.tokens[index+1][0] == self.minus_sign:
-                        self.tokens.insert(index, self.minus_sign)
-                    else:
-                        self.tokens.insert(index, self.plus_sign)
+        
+        # check if the equation need sign fix
+        no_sign_issue = False
+        for i, token in enumerate(self.tokens): 
+            if i < len(self.tokens)-1 and token not in self.all_operators and self.tokens[i+1] not in self.all_operators:
+                no_sign_issue = True
+        if no_sign_issue:
+            for index, token in enumerate(self.tokens):
+                if token.isdigit() or token not in self.all_operators and index < len(self.tokens) - 2:
+                    if self.tokens[index+1] not in self.all_operators:
+                        if self.tokens[index+1][0] == self.minus_sign:
+                            self.tokens.insert(index, self.minus_sign)
+                        else:
+                            self.tokens.insert(index, self.plus_sign)
         return self.tokens
     
     # Simple Base  Case: ax + b = c  ---> ax = d
@@ -159,10 +171,35 @@ class Absoluver():
         new_tokens.append(new_answer)
 
         position = self.tokens.index(self.equal_sign)
+        # Make the expression change into tokens +2 --> ["+", "2"]
         change = self.expression_tokenization(value_change)
         sample_tokens = self.tokens[0:position] + change + self.tokens[position:] + change
+
+        # Create a dictionary format for the solution in order to be parsed
+        solution = {
+            "equation": ' '.join(str(term) for term in self.tokens),
+            "step_count": str(self.step_count),
+            "step": step,
+            "step_equation":  ' '.join(str(term) for term in sample_tokens),
+            "new_equation": ' '.join(str(term) for term in new_tokens)
+        }
+        self.solution_steps.append(solution)
+        self.tokens = new_tokens
+        self.step_count += 1
         return step, sample_tokens, new_tokens
 
+    def solution_case(self):
+        if self.variable == self.tokens[0] and self.constants == [0, 1]:
+            self.final_solution = {self.variable : str(self.tokens[-1])}
+        step = "Solution"
+        solution = {
+            "equation": ' '.join(str(term) for term in self.tokens),
+            "step_count": str(self.step_count),
+            "step": step,
+            "step_equation":  ' '.join(str(term) for term in self.tokens),
+            "new_equation": ' '.join(str(term) for term in self.tokens)
+        }
+        self.solution_steps.append(solution)
     # Base Case: ax = b --> x = b
     def base_case(self):
         new_tokens = []
@@ -190,16 +227,28 @@ class Absoluver():
         answer = int(factor2) / int(factor)
         new_tokens.append(round(answer, 2))
 
+        # Get the position of the equal sign
         position = self.tokens.index(self.equal_sign)
         change = self.expression_tokenization(self.divide_sign + factor)
-        print(change)
+        # Make a step equation
         sample_tokens = self.tokens[0:position] + change + self.tokens[position:] + change
-
+        solution = {
+            "equation": ' '.join(str(term) for term in self.tokens),
+            "step_count": str(self.step_count),
+            "step": step,
+            "step_equation":  ' '.join(str(term) for term in sample_tokens),
+            "new_equation": ' '.join(str(term) for term in new_tokens)
+        }
+        self.solution_steps.append(solution)
+        self.tokens = new_tokens
+        self.step_count += 1
         return step, sample_tokens, new_tokens
 
     # Arrange terms: ax + c = bx + d  --->  ax - bx = d - c
     def terms_arrangement(self):
         print("terms")
+        solution = '{"equation": '+ self.tokens +', "step_count":'+ self.step_count +', "step": '+ step +', "step_equation": '+ sample_tokens+', "new_equation":'+ new_tokens+'}'
+        self.solution_steps.append(solution)
         # Traverse through each token
         # for index, term in enumerate(self.tokens):
             # Left hand side check
@@ -234,6 +283,9 @@ class Absoluver():
             tokens[position[0]:position[1]] = new_tokens
         else:
             tokens[position[0]-1:position[1]] = new_tokens
+
+        solution = '{"equation": '+ self.tokens +', "step_count":'+ self.step_count +', "step": '+ step +', "step_equation": '+ sample_tokens+', "new_equation":'+ new_tokens+'}'
+        self.solution_steps.append(solution)
 
         print(tokens)
         print("Move")
@@ -353,6 +405,11 @@ class Absoluver():
         return tokens[start_pos:end_pos+1], coefficient, (start_pos, end_pos+1)
 
     def expression_classifier_count(self):
+        # Reset The Count for the new expression classifier count
+        self.variables = [0, 0]
+        self.constants = [0, 0]
+        self.parenthesis_pair = [0, 0]
+
         # Types
         # Base -> ax = c -> 0
         # Base2 -> ax + b = c -> 1
@@ -362,34 +419,34 @@ class Absoluver():
         # Base Test 
         for index, value in enumerate(self.tokens):
             # left side
-            if (index < self.tokens.index(self.equal_sign)) and value not in self.all_operators:
+            if (index < self.tokens.index(self.equal_sign)) and str(value) not in self.all_operators:
                 #check if its a signs
                 #check if constant
-                if str(value).isdigit():
+                if not bool(re.search('[a-z]', str(value))) and str(value) not in self.all_operators:
                     self.constants[0] += 1
-                if str(value)[-1].isalpha():
+                if bool(re.search('[a-z]', str(value))):
                     self.variables[0] += 1
                     self.variable = str(value)[-1]
             # right side
-            if (index > self.tokens.index(self.equal_sign)) and value not in self.all_operators:
-                if str(value).isdigit():
+            if (index > self.tokens.index(self.equal_sign)) and str(value) not in self.all_operators:
+                if not bool(re.search('[a-z]', str(value))) and str(value) not in self.all_operators:
                     self.constants[1] += 1
-                if value[-1].isalpha():
+                if bool(re.search('[a-zA-Z]', str(value))):
                     self.variables[1] += 1
             pair = False
             pair_count = 0
             if (index < self.tokens.index(self.equal_sign)):
-                if (value == self.open_bracket):
+                if (str(value) == self.open_bracket):
                     pair_count += 1
-                if (value == self.close_bracket):
+                if (str(value) == self.close_bracket):
                     pair_count += 1
                     if (pair_count == 1):
                         self.parenthesis_pair[0] += 1
                         pair_count = 0
             if (index > self.tokens.index(self.equal_sign)):
-                if (value == self.open_bracket):
+                if (str(value) == self.open_bracket):
                     pair_count += 1
-                if (value == self.close_bracket):
+                if (str(value) == self.close_bracket):
                     pair_count += 1
                     if (pair_count == 1):
                         self.parenthesis_pair[1] += 1
@@ -399,8 +456,10 @@ class Absoluver():
     def check_cases(self):
         if self.parenthesis_pair[0] > 0 and self.parenthesis_pair[1] > 0:
             self.equation_state = "brackets_off_simplification"
-        elif self.variables == [1, 0] and self.constants == [0, 1] and self.parenthesis_pair == [0, 0]:
+        elif self.variables == [1, 0] and self.constants == [0, 1] and self.parenthesis_pair == [0, 0] and len(self.tokens[0]) != 1:
             self.equation_state = "base_case"
+        elif self.variables == [1, 0] and self.constants == [0, 1] and self.parenthesis_pair == [0, 0] and self.tokens[0] == self.variable:
+            self.equation_state = "solution_case"
         elif self.variables == [1, 0] and self.constants == [1, 1] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "simple_base_case"
         elif self.variables == [1, 1] and self.constants == [1, 1] and self.parenthesis_pair == [0, 0]:
@@ -412,40 +471,35 @@ class Absoluver():
 
     # run the application and solve the equation
     def run(self):
-        instance.equation_tokenization()
-        instance.fix_signs()
-        instance.expression_classifier_count()
-        instance.check_cases()
-        print(self.equation_state)
-        if self.equation_state == "base_case":
-            self.base_case()
-        elif self.equation_state == "simple_base_case":
-            self.simple_base_case()
-        elif self.equation_state == "terms_arrangement":
-            self.terms_arrangement()
-        elif self.equation_state == "algebraic_simplification":
-            self.algebraic_simplification()
-        elif self.equation_state == "numerical_simplification":
-            self.numerical_simplification()
-        elif self.equation_state == "brackets_off_simplification":
-            self.numerical_simplification()
-        else:
-            self.error_message = "Expression cannot be classified"
+        self.equation_tokenization()
+        self.fix_signs()
+        while len(self.final_solution) == 0:
+            print("Inside The Loop")
+            self.expression_classifier_count()
+            self.check_cases()
+            if self.equation_state == "solution_case":
+                self.solution_case()
+            elif self.equation_state == "base_case":
+                self.base_case()
+            elif self.equation_state == "simple_base_case":
+                self.simple_base_case()
+            elif self.equation_state == "terms_arrangement":
+                self.terms_arrangement()
+            elif self.equation_state == "algebraic_simplification":
+                self.algebraic_simplification()
+            elif self.equation_state == "numerical_simplification":
+                self.numerical_simplification()
+            elif self.equation_state == "brackets_off_simplification":
+                self.numerical_simplification()
+            else:
+                self.error_message = "Expression cannot be classified"
 
+        # print(instance.equation_tokenization())
+        print("Hooray Solved")
+        print(self.solution_steps)
 
 if __name__ == '__main__':
-    instance = Absoluver("2y + 3 + 2 + 2= 4 +2")
-    instance.equation_tokenization()
-    instance.fix_signs()
-    instance.expression_classifier_count()
-    instance.check_cases()
-    print(instance.equation_state)
-    print(instance.tokens)
-    instance.numerical_simplification()
-    instance.fix_signs()
-    print("New tokens")
-    print(instance.tokens)
-
-    # print(instance.equation_tokenization())
-
-    # app.run()
+    # instance = Absoluver("7x - 2 = 21")
+    # instance.run()
+    
+    app.run()

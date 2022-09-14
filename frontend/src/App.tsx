@@ -1,42 +1,34 @@
 import React, {useState, useEffect} from 'react';
 
 function App() {
+  const [data, setData] = useState({})
   const [solution, setSolution] = useState({})
-  const [error, setError] = useState()
-  const [errorMessage, setErrorMessage] = useState("Please enter a valid equation!")
+  const [steps, setSteps] = useState([])
+  const [variable, setVariable] = useState("")
+  const [equat, setEquat] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
   const [equation, setEquation] = useState("")
-  const validation = (equation: string) => {
-    let status = true
-    for (let i = 0; i < equation.length; i++) {
-      if ((equation.indexOf("=") === equation.length - 1 ) || (equation.indexOf("=") === 0 )) {
-        status = false
-      }
-      if (equation.indexOf("=") === 0 ) {
-        status = false
-      }
-      console.log(equation[i]);
-    }
-    return status
-  }
   const handleSubmit = async (e: React.ChangeEvent<any>) => {
-    if (!validation(equation)) {
-      console.log("Validated False")
-      return
-    }
-    // e.preventDefault();
-    console.log("Pressed")
-    const requestOptions = {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    const response = await fetch(`http://localhost:5000/?equation=${equation}`, requestOptions)
+    e.preventDefault()
+    console.log(equation)
+    let decodedEquation = equation.replace("+", "%2B")
+    decodedEquation = decodedEquation.replace("-", "%2D")
+    decodedEquation = decodedEquation.replace("=", "%3D")
+    decodedEquation = decodedEquation.replace("*", "%2A")
+    decodedEquation = decodedEquation.replace("+", "%2B")
+    decodedEquation = decodedEquation.replace("(", "%28")
+    decodedEquation = decodedEquation.replace(")", "%29")
+    console.log(decodedEquation)
+    const response = await fetch(`http://localhost:5000/?equation=${decodedEquation}`)
     const data = await response.json()
     console.log(data)
+    setData(data)
+    setSteps(data.steps)
+    setVariable(data.variable)
+    setEquat(data.equation)
+    console.log(data.steps[0].step)
     setEquation("")
-    }  
-  const solutions = ["Add 2 to both sides", "Simplify", "Divide both sides by same factor 7", " Simplify", "Solution"]
+  }
   return (
     <div className="w-screen py-8 bg-gradient-to-t from-blue-300 via-green-200 to-yellow-300">
         <div className="container flex flex-col items-center w-full">
@@ -57,20 +49,24 @@ function App() {
               </form>
           </div>
           <section className="grid w-full py-4 solution place-items-center">
-            <div className="flex flex-col items-center px-4 py-4 my-2 bg-white rounded-md shadow-md problem w-72">
-                <h5 className="text-xl">Solve for x</h5>
-                <h6 className="text-sm">7x - 2 = 21</h6>
-            </div>
             {
-            solutions.map(( value, key) => {
+              (steps.length !== 0) && (
+              <div className="flex flex-col items-center px-4 py-4 my-2 bg-white rounded-md shadow-md problem w-72">
+                  <h5 className="text-xl">Solve for {variable}</h5>
+                  <h6 className="text-sm">{equat}</h6>
+              </div>)
+            }
+            {
+            (steps) && 
+            steps.map((value: any, key) => {
               return <div key={key} className="flex items-center w-11/12 px-4 py-4 my-2 bg-white rounded-md shadow-md problem md:w-1/2 sm:w-8/12">
-                        <div className="grid w-8 h-8 text-sm text-center text-blue-500 border border-blue-500 rounded-full steps place-items-center">{key}</div>
-                        <div className="flex flex-col pl-4 step">
-                            <h5 className="text-md ">{value}</h5>
-                            <h6 className="pt-2 text-sm">7x - 2 = 21</h6>
+                        <div className="grid w-8 h-8 text-sm text-center text-blue-500 border border-blue-500 rounded-full steps place-items-center">{value.step_count}</div>
+                          <div className="flex flex-col pl-4 step">
+                              <h5 className="text-md ">{value.step}</h5>
+                              <h6 className="pt-2 text-sm">{value.step_equation}</h6>
+                          </div>
                         </div>
-                      </div>
-              })
+                      })      
             }
           </section>
         </div>
