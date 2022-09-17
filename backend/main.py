@@ -106,6 +106,9 @@ class Absoluver():
         trimmed = self.equation.replace(" ", "")
         spaced_equation = re.sub("[\(\+\-\)=]",  lambda operator: " " + operator[0] + " ", trimmed)
         tokenized_equation =  word_tokenize(spaced_equation)
+        if tokenized_equation[0] == self.minus_sign and tokenized_equation[1] not in self.all_operators:
+            tokenized_equation[1] = self.minus_sign + tokenized_equation[1]
+            tokenized_equation.pop(0)
         self.tokens = tokenized_equation
         return tokenized_equation
 
@@ -211,20 +214,19 @@ class Absoluver():
         for index, value in enumerate(self.tokens):
             if not str(value).isdigit() and value not in self.all_operators and index < self.tokens.index(self.equal_sign):
                 temp = ""
-                for i in value:
-                    if not i.isdigit():
-                        new_tokens.append(i)
-                    if i.isalpha():
-                        temp = value
-                        temp = ''.join(j for j in temp if j.isdigit())
+                if value[-1] == self.variable:
+                    print("Yes")
+                    temp = value[:-1]
+                    new_tokens.append(self.variable)
                 factor = temp
             if value not in self.all_operators and index > self.tokens.index('='):
                 factor2 = value
 
         # print(f"{factor2} = {factor}")
         step = f"Divide both sides by {factor}"
+        print(step)
         new_tokens.append(self.equal_sign)
-        answer = int(factor2) / int(factor)
+        answer = eval(f"{factor2} / {factor}")
         new_tokens.append(round(answer, 2))
 
         # Get the position of the equal sign
@@ -475,6 +477,7 @@ class Absoluver():
         self.fix_signs()
         while len(self.final_solution) == 0:
             print("Inside The Loop")
+            print(self.tokens)
             self.expression_classifier_count()
             self.check_cases()
             if self.equation_state == "solution_case":
@@ -499,7 +502,9 @@ class Absoluver():
         print(self.solution_steps)
 
 if __name__ == '__main__':
-    # instance = Absoluver("7x - 2 = 21")
-    # instance.run()
+    instance = Absoluver("-7x - 2 = 21")
+    instance.equation_tokenization()
+    instance.run()
+    print(instance.tokens)
     
-    app.run()
+    # app.run()
