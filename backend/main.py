@@ -31,6 +31,7 @@ def test():
     print(instance.equation_tokenization())
     return json.dumps({steps : instance.equation_tokenization()})
 
+
 class Absoluver():
     def __init__(self, equation):
         #operations instances
@@ -249,12 +250,50 @@ class Absoluver():
     # Arrange terms: ax + c = bx + d  --->  ax - bx = d - c
     def terms_arrangement(self):
         print("terms")
-        solution = '{"equation": '+ self.tokens +', "step_count":'+ self.step_count +', "step": '+ step +', "step_equation": '+ sample_tokens+', "new_equation":'+ new_tokens+'}'
-        self.solution_steps.append(solution)
+        new_terms = self.tokens
+        right_transpose = []
+        right_transpose_indeces = []
+        left_transpose = []
+        left_transpose_indeces = []
+        popped = 0
+
         # Traverse through each token
-        # for index, term in enumerate(self.tokens):
+        for index, term in enumerate(self.tokens):
             # Left hand side check
-            # if index < self.tokens.index(self.equal_sign):
+            print(new_terms)
+            if term[-1] != self.variable and term not in self.all_operators and index < self.tokens.index(self.equal_sign):
+                if self.tokens[index - 1] in self.all_operators:
+                    left_transpose.append(self.tokens[index-1])
+                    left_transpose_indeces.append(index-1)
+                left_transpose.append(self.tokens[index])
+                left_transpose_indeces.append(index)
+            #right hand side check
+            if term[-1] == self.variable and term not in self.all_operators and index > self.tokens.index(self.equal_sign):
+                if self.tokens[index - 1] in self.all_operators and self.tokens[index -1] != self.equal_sign:
+                    right_transpose.append(self.tokens[index-1])
+                    right_transpose_indeces.append(index - 1)
+                right_transpose.append(self.tokens[index])
+                right_transpose_indeces.append(index)
+        # insert changes
+        print(left_transpose)
+        print(right_transpose)
+
+        # change signs left change
+        if left_transpose[0] == self.minus_sign:
+            left_transpose[0] = self.plus_sign
+        elif left_transpose[0] == self.plus_sign:
+            left_transpose[0] = self.minus_sign
+        
+        # change signs right change
+        if right_transpose[0] == self.minus_sign:
+            right_transpose[0] = self.plus_sign
+        elif right_transpose[0] == self.plus_sign:
+            right_transpose[0] = self.minus_sign
+
+        # put the signs together
+        new_sliced = new_terms[:left_transpose_indeces[0]] + right_transpose + new_terms[left_transpose_indeces[1]+1:right_transpose_indeces[0]] + left_transpose
+        print(new_sliced)
+                
     
     # Remove brackets: a(bx + c) = d  ---> abx + ac = d
     def brackets_off_simplification(self):
@@ -385,8 +424,30 @@ class Absoluver():
     
     # Algebraic simplification: ax + bx  + c = e  ---> dx + c = e
     def algebraic_simplification(self):
-        pass
-    
+        right_terms = []
+        right_terms_index = []
+        # left hand side simplification
+        for index, term in enumerate(self.tokens):
+            if index < self.tokens.index(self.equal_sign):
+                if term in self.all_operators:
+                    if self.tokens[index - 1][-1] == self.variable and self.tokens[index + 1][-1] == self.variable:
+                        right_terms.append(self.tokens[index - 1])
+                        right_terms_index.append(index-1)
+                        right_terms.append(term)
+                        right_terms.append(self.tokens[index + 1])
+                        right_terms_index.append(index+1)
+                    
+        
+        # print(right_terms)
+        stringed = "".join(right_terms)
+        stringed = stringed.replace(self.variable, "")
+        # print(stringed)
+        new_expression = str(eval(stringed))  + self.variable
+        # print(new_expression)
+        self.tokens[right_terms_index[0]:right_terms_index[1]+1] = [new_expression]
+        print(self.tokens)
+        # right hand side simplification
+
     # Extract the coefficient
     def parenthesis_identifier(self):
         coefficient = 1
@@ -502,9 +563,12 @@ class Absoluver():
         print(self.solution_steps)
 
 if __name__ == '__main__':
-    instance = Absoluver("-7x - 2 = 21")
+    instance = Absoluver("-7x - 2x = 21 + 2")
     instance.equation_tokenization()
-    instance.run()
+    instance.expression_classifier_count()
+    instance.check_cases()
     print(instance.tokens)
+    print(instance.equation_state)
+    instance.algebraic_simplification()
     
     # app.run()
