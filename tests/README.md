@@ -8,11 +8,11 @@ In the project directory, you can run:
 
 |Test Number   	| Test Case  	|  Input 	| Output  	|  Results 	|
 |---	|---	|---	|---	|---	|
-|  1 	|   	|   	|   	|   	|
-|  2 	|   	|   	|   	|   	|
-|  3 	|   	|   	|   	|   	|
-|  4 	|   	|   	|   	|   	|
-|  5 	|   	|   	|   	|   	|
+|  1 	|   	| 2x + 4 = 10  	|    	|   	|
+|  2 	|   	| 2x + 4 = 10  	|   	|   	|
+|  3 	|   	| 2x + 4 = 10  	|   	|   	|
+|  4 	|   	| 2x + 4 = 10  	|   	|   	|
+|  5 	|   	| 2x + 4 = 10  	|   	|   	|
 |  6 	|   	|   	|   	|   	|
 |  7 	|   	|   	|   	|   	|
 |  8 	|   	|   	|   	|   	|
@@ -34,8 +34,8 @@ In the project directory, you can run:
 
 |Test Number   	| Test Case  	|  Input 	| Output  	|  Results 	|
 |---	|---	|---	|---	|---	|
-|  1 	|   	|   	|   	|   	|
-|  2 	|   	|   	|   	|   	|
+|  1 	|   	| 2x + 4 = 10  	|   	|   	|
+|  2 	|   	| 2x + 4 = 10  	|   	|   	|
 |  3 	|   	|   	|   	|   	|
 |  4 	|   	|   	|   	|   	|
 |  5 	|   	|   	|   	|   	|
