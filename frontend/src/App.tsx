@@ -46,7 +46,9 @@ function App() {
                       </button>
                 </div>
                 <h1 className="pt-2 text-red-400">{errorMessage}</h1>
+                <ChangeColor />
               </form>
+
           </div>
           <section className="grid w-full py-4 solution place-items-center">
             {
@@ -63,7 +65,7 @@ function App() {
                         <div className="grid w-8 h-8 text-sm text-center text-blue-500 border border-blue-500 rounded-full steps place-items-center">{value.step_count}</div>
                           <div className="flex flex-col pl-4 step">
                               <h5 className="text-md ">{value.step}</h5>
-                              <h6 className="pt-2 text-sm">{value.step_equation}</h6>
+                              <h6 className="pt-2 text-sm">{document.createElement('div').innerHTML = value.step_equation}</h6>
                           </div>
                         </div>
                       })      
@@ -74,3 +76,15 @@ function App() {
   );
 }
 export default App;
+
+
+const ChangeColor = (props: any) => {
+  let equation = "2x - 5 = 5"
+  equation.replace("- 5", "- 6")
+  let text = <h1>{`${equation}`}</h1>
+  return (
+  <>
+    {text}
+  </>
+  )
+} 

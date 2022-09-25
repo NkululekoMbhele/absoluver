@@ -360,14 +360,22 @@ class Absoluver():
         else:
             new_terms.pop(left_transpose_indeces[0])
 
-
+        print("Transposes")
+        print(left_transpose)
+        print(right_transpose)
         # change signs left change
         if left_transpose[0] == self.minus_sign:
             left_transpose[0] = self.plus_sign
         elif left_transpose[0] == self.plus_sign:
             left_transpose[0] = self.minus_sign
+
+        # change signs right change normal format
+        if right_transpose[0] == self.minus_sign:
+            right_transpose[0] = self.plus_sign
+        elif right_transpose[0] == self.plus_sign:
+            right_transpose[0] = self.minus_sign
         
-        # change signs right change
+        # change signs right change when sign embedded on the term
         if len(right_transpose) == 1 and right_transpose[0][0] == self.minus_sign:
             right_transpose[0] = right_transpose[0][1:]
             right_transpose.insert(0, self.plus_sign)
@@ -483,7 +491,6 @@ class Absoluver():
                         new_value = value.replace(variable, "")
                         new_variable_coeffient = eval(f"{coefficient} * {new_value}")
                         new_tokens.append(f"{new_variable_coeffient}{variable}")
-
             elif str(value).isdigit():
                 new_tokens.append(str(eval(f"{coefficient} * {value}")))
             else:
@@ -540,10 +547,15 @@ class Absoluver():
                         right_indeces[1] = index
                     add_tokens_right.append(term)
         left_answer = eval(f"{' '.join(add_tokens_left)}")
+        print(f"left answer {add_tokens_left}")
         if self.constants[1] > 1:
             right_answer = eval(f"{' '.join(add_tokens_right)}")
             copy_tokens = copy_tokens[:right_indeces[0]] + [str(right_answer)] + copy_tokens[right_indeces[1]+1:]
-        copy_tokens = copy_tokens[:left_indeces[0]] + [str(left_answer)] + copy_tokens[left_indeces[1]+1:]
+        if str(left_answer)[0] == self.minus_sign:
+            copy_tokens = copy_tokens[:left_indeces[0]] + [str(left_answer)] + copy_tokens[left_indeces[1]+1:]
+        else:
+            copy_tokens = copy_tokens[:left_indeces[0]] + [self.plus_sign, str(left_answer)] + copy_tokens[left_indeces[1]+1:]
+
         self.tokens = copy_tokens
         self.fix_signs()
         step = f"Simplify constants values"
@@ -791,7 +803,7 @@ class Absoluver():
 
 if __name__ == '__main__':
     # test = ["-7x - 2 + 5 - (2x + 6 + 2x) = -21x -6 + 2 + 2x", "4x + 6 = 21", "7x - 2 = 21", "x = 2 + 6", "4x = x + 6"]
-    instance = Absoluver("2(4x + 3) + 6 = 24 -4x")
-    instance.run()
-    # app.run(host="0.0.0.0", port=5000)
+    # instance = Absoluver("2(4x + 3) + 6 = 24 -4x")
+    # instance.run()
+    app.run(host="0.0.0.0", port=5000)
 
