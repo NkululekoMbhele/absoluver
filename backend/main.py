@@ -4,10 +4,7 @@ from flask import Flask, request
 import re
 import nltk
 from nltk.tokenize import word_tokenize
-import sympy
-from sympy.core.assumptions import assumptions
-from sympy import Symbol
-import sympy as sym
+import sys
 
 
 app = Flask(__name__)
@@ -30,6 +27,10 @@ def test():
     instance = Absoluver("2x + 3 = 4")
     print(instance.equation_tokenization())
     return json.dumps({steps : instance.equation_tokenization()})
+
+@app.route('/hello', methods=['GET', 'POST'])
+def test():
+    return json.dumps({steps : "Hello World!"})
 
 
 class Absoluver():
@@ -803,7 +804,9 @@ class Absoluver():
 
 if __name__ == '__main__':
     # test = ["-7x - 2 + 5 - (2x + 6 + 2x) = -21x -6 + 2 + 2x", "4x + 6 = 21", "7x - 2 = 21", "x = 2 + 6", "4x = x + 6"]
-    # instance = Absoluver("2(4x + 3) + 6 = 24 -4x")
-    # instance.run()
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host='0.0.0.0', port=8080, debug=True)
+    # if len(sys.argv) == 1:
+    # elif sys.argv[2] == "dev":
+    #     instance = Absoluver(args[3])
+    #     instance.run()
 
