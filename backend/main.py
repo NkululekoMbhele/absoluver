@@ -6,7 +6,6 @@ import nltk
 from nltk.tokenize import word_tokenize
 import sys
 
-
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -29,7 +28,7 @@ def test():
     return json.dumps({steps : instance.equation_tokenization()})
 
 @app.route('/hello', methods=['GET', 'POST'])
-def test():
+def test_hello():
     return json.dumps({steps : "Hello World!"})
 
 
@@ -181,6 +180,8 @@ class Absoluver():
                 temp = ""
                 if value[-1] == self.variable:
                     temp = value[:-1]
+                    if temp == self.minus_sign:
+                        temp = temp + "1"
                     new_tokens.append(self.variable)
                 factor = temp
             if value not in self.all_operators and index > self.tokens.index('='):
@@ -261,55 +262,75 @@ class Absoluver():
     def simplification_base_case(self):
         copy_tokens = self.tokens
         old_tokens = self.tokens
+        step = ""
         add_tokens_left = []
         add_tokens_right = []
         left_indeces = [0, 0]
         right_indeces = [0, 0]
         # algebraic_simplification
-        for index, term in enumerate(copy_tokens):
-            if  index < copy_tokens.index(self.equal_sign) and bool(re.search("[a-z]", term)) or term in self.all_operators:
-                check_state_one = not bool(re.search("[a-z]", copy_tokens[index - 1])) and not bool(re.search("[a-z]", copy_tokens[index + 1])) 
-                check_state_two = bool(re.search("[a-z]", copy_tokens[index - 1])) and not bool(re.search("[a-z]", copy_tokens[index + 1]))
-                if bool(re.search("[a-z]", term)):
-                    add_tokens_left.append(term)
-                    if left_indeces[0] == 0:
-                        left_indeces[0] = index
-                    else:
-                        left_indeces[1] = index
-                if not (check_state_one or check_state_two) and term != self.equal_sign and index < copy_tokens.index(self.equal_sign):
-                    add_tokens_left.append(term)
-                    if left_indeces[0] == 0:
-                        left_indeces[0] = index
-                    else:
-                        left_indeces[1] = index
-            if  index > copy_tokens.index(self.equal_sign) and not bool(re.search("[a-z]", term)) or term in self.all_operators:
-                if not bool(re.search("[a-z]", term)) and term not in self.all_operators:
-                    add_tokens_right.append(term)
-                    if right_indeces[0] == 0:
-                        right_indeces[0] = index
-                    else:
-                        right_indeces[1] = index
-                if term in self.all_operators:
-                    check_state_one = bool(re.search("[a-z]", copy_tokens[index - 1])) and bool(re.search("[a-z]", copy_tokens[index + 1])) 
-                    check_state_two = not bool(re.search("[a-z]", copy_tokens[index - 1])) and bool(re.search("[a-z]", copy_tokens[index + 1]))
-                    if not (check_state_one or check_state_two) and term != self.equal_sign and index > copy_tokens.index(self.equal_sign):
+
+        if self.variables == [1, 0] and self.constants == [0, 2] and len(self.tokens[0]) == 1:
+            index = self.tokens.index(self.equal_sign)
+            print(self.tokens[index+1:])
+            expression = " ".join(self.tokens[index+1:])
+            new_answer = eval(expression)
+            self.tokens = self.tokens[:index+1] + [str(new_answer)]
+            print(self.tokens)
+            self.equation_state = "solution_case"
+            step = "Simplify the right hand side"
+        elif self.variables == [1, 0] and self.constants == [0, 2] and len(self.tokens[0]) == 2:
+            index = self.tokens.index(self.equal_sign)
+            print(self.tokens[index+1:])
+            expression = " ".join(self.tokens[index+1:])
+            new_answer = eval(expression)
+            self.tokens = self.tokens[:index+1] + [str(new_answer)]
+            print(self.tokens)
+            self.equation_state = "base_case"
+            step = "Simplify the right hand side"
+        else:
+            for index, term in enumerate(copy_tokens):
+                if  index < copy_tokens.index(self.equal_sign) and bool(re.search("[a-z]", term)) or term in self.all_operators:
+                    check_state_one = not bool(re.search("[a-z]", copy_tokens[index - 1])) and not bool(re.search("[a-z]", copy_tokens[index + 1])) 
+                    check_state_two = bool(re.search("[a-z]", copy_tokens[index - 1])) and not bool(re.search("[a-z]", copy_tokens[index + 1]))
+                    if bool(re.search("[a-z]", term)):
+                        add_tokens_left.append(term)
+                        if left_indeces[0] == 0:
+                            left_indeces[0] = index
+                        else:
+                            left_indeces[1] = index
+                    if not (check_state_one or check_state_two) and term != self.equal_sign and index < copy_tokens.index(self.equal_sign):
+                        add_tokens_left.append(term)
+                        if left_indeces[0] == 0:
+                            left_indeces[0] = index
+                        else:
+                            left_indeces[1] = index
+                if  index > copy_tokens.index(self.equal_sign) and not bool(re.search("[a-z]", term)) or term in self.all_operators:
+                    if not bool(re.search("[a-z]", term)) and term not in self.all_operators:
                         add_tokens_right.append(term)
                         if right_indeces[0] == 0:
                             right_indeces[0] = index
                         else:
                             right_indeces[1] = index
-                
-        left_expression = ' '.join(add_tokens_left).replace(self.variable, "")
-        left_answer = str(eval(f"{str(left_expression)}")) + self.variable
+                    if term in self.all_operators:
+                        check_state_one = bool(re.search("[a-z]", copy_tokens[index - 1])) and bool(re.search("[a-z]", copy_tokens[index + 1])) 
+                        check_state_two = not bool(re.search("[a-z]", copy_tokens[index - 1])) and bool(re.search("[a-z]", copy_tokens[index + 1]))
+                        if not (check_state_one or check_state_two) and term != self.equal_sign and index > copy_tokens.index(self.equal_sign):
+                            add_tokens_right.append(term)
+                            if right_indeces[0] == 0:
+                                right_indeces[0] = index
+                            else:
+                                right_indeces[1] = index
+                    
+            left_expression = ' '.join(add_tokens_left).replace(self.variable, "")
+            left_answer = str(eval(f"{str(left_expression)}")) + self.variable
 
-        right_expression = ' '.join(add_tokens_right)
-        right_answer = str(eval(f"{str(right_expression)}"))
-
-        copy_tokens = copy_tokens[:right_indeces[0]] + [str(right_answer)]
-        copy_tokens = [str(left_answer)] + copy_tokens[left_indeces[1]+1:]
-        self.tokens = copy_tokens
-        self.fix_signs()
-        step = f"Simplify right hand side terms and left hand side"
+            right_expression = ' '.join(add_tokens_right)
+            right_answer = str(eval(f"{str(right_expression)}"))
+            copy_tokens = copy_tokens[:right_indeces[0]] + [str(right_answer)]
+            copy_tokens = [str(left_answer)] + copy_tokens[left_indeces[1]+1:]
+            self.tokens = copy_tokens
+            self.fix_signs()
+            step = f"Simplify right hand side terms and left hand side"
 
         # Create a dictionary format for the solution in order to be parsed
         solution = {
@@ -575,24 +596,33 @@ class Absoluver():
             
     # Group same type of terms together
     def group_tokens(self):
-        insert_index = 0
         # left hand side grouping
-        top_index = self.tokens.index(self.equal_sign)-1
         old_tokens = self.tokens
-        if self.variables[0] + self.constants[0] >= 3:
-            for i in range(len(self.tokens[:self.tokens.index(self.equal_sign)-1]), -1, -1):
-                if not re.search("[a-zA-Z]", str(self.tokens[i])) and self.tokens[i] not in self.all_operators:
-                    if insert_index == 0:
-                        self.tokens = self.tokens[:top_index+1] + [self.tokens[i-1], self.tokens[i]] + self.tokens[top_index+1:]
-                        insert_index = top_index-2
-                        self.tokens.pop(i-1)
-                        self.tokens.pop(i-1)
+        insert_index = 0
+        for i in range(0, len(self.tokens[:self.tokens.index('=')-1])+1):
+            if re.search("[a-zA-Z]", str(self.tokens[i])) and self.tokens[i] not in self.all_operators:
+                if insert_index == 0:
+                    if self.tokens[i-1] == '-':
+                        term = '-' + self.tokens[i]
                     else:
-                        self.tokens = self.tokens[:insert_index+1] + [self.tokens[i-1], self.tokens[i]] + self.tokens[insert_index+1:]
-                        insert_index -= 2
-                        self.tokens.pop(i-1)
-                        self.tokens.pop(i-1)
-
+                        term = self.tokens[i]
+                    if self.tokens[0][0] != '-':
+                        self.tokens = [term, "+"] + self.tokens
+                    else:
+                        self.tokens = [term] + self.tokens
+                    insert_index = 1
+                    self.tokens.pop(i+1)
+                    self.tokens.pop(i+1)
+                else:
+                    if self.tokens[i-1] == '-':
+                        term = ['-', self.tokens[i]]
+                    else:
+                        term = ['+', self.tokens[i]]
+                    self.tokens = self.tokens[:insert_index] + term + self.tokens[insert_index:]
+                    self.tokens.pop(i+1)
+                    self.tokens.pop(i+1)
+                    insert_index += 2
+        print(self.tokens)
         # Right hand side grouping  
         top_index = self.tokens.index(self.equal_sign) + 1
         insert_index = 0
@@ -749,11 +779,13 @@ class Absoluver():
             self.equation_state = "brackets_off_simplification"
         elif self.variables == [1, 0] and self.constants == [0, 1] and self.parenthesis_pair == [0, 0] and len(self.tokens[0]) != 1:
             self.equation_state = "base_case"
-        elif self.variables == [1, 0] and self.constants == [0, 1] and self.parenthesis_pair == [0, 0] and self.tokens[0] == self.variable:
+        elif self.variables == [1, 0] and self.constants == [0, 1] and self.parenthesis_pair == [0, 0] and self.tokens[0] == self.variable and len(self.tokens[0])==1:
             self.equation_state = "solution_case"
         elif self.variables == [1, 0] and self.constants == [1, 1] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "simple_base_case"
         elif self.variables == [2, 0] and self.constants == [0, 2] and self.parenthesis_pair == [0, 0]:
+            self.equation_state = "simplification_base_case"
+        elif self.variables == [1, 0] and self.constants == [0, 2] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "simplification_base_case"
         elif self.variables == [1, 1] and self.constants == [1, 1] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "terms_arrangement"
@@ -761,13 +793,17 @@ class Absoluver():
             self.equation_state = "terms_simplification"
         elif self.variables == [1, 1] and self.constants == [2, 1] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "terms_simplification"
+        elif self.variables > [1, 1] and self.constants > [1, 0] and self.parenthesis_pair == [0, 0]:
+            self.equation_state = "terms_simplification"
 
     def terms_simplification(self):
         print(self.variables)
         print(self.constants)
         self.group_tokens()
-        if self.variables == [1, 1] and self.constants == [2, 1] and self.parenthesis_pair == [0, 0]:
+        if self.variables == [1, 1] and self.constants == [2, 1]:
             self.equation_state = "terms_simplification"
+            self.numerical_simplification()
+        if self.variables == [1, 0] and self.constants == [2, 1]:
             self.numerical_simplification()
         else:
             self.numerical_simplification()
@@ -803,10 +839,10 @@ class Absoluver():
         print(self.solution_steps)
 
 if __name__ == '__main__':
-    # test = ["-7x - 2 + 5 - (2x + 6 + 2x) = -21x -6 + 2 + 2x", "4x + 6 = 21", "7x - 2 = 21", "x = 2 + 6", "4x = x + 6"]
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    test = ["-7x - 2 + 5 - (2x + 6 + 2x) = -21x -6 + 2 + 2x", "4x + 6 = 21", "7x - 2 = 21", "15x - 5 = 0", "6x + 2 + 26 = 4x + x", "4x = x + 6"]
+    # app.run(host='0.0.0.0', port=8080, debug=True)
     # if len(sys.argv) == 1:
     # elif sys.argv[2] == "dev":
-    #     instance = Absoluver(args[3])
-    #     instance.run()
+    instance = Absoluver(test[4])
+    instance.run()
 
