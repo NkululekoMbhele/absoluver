@@ -665,59 +665,71 @@ class Absoluver():
         left_indeces = [0, 0]
         right_indeces = [0, 0]
         self.expression_classifier_count()
-        for index, term in enumerate(copy_tokens):
-            if  index < copy_tokens.index(self.equal_sign) and bool(re.search("[a-z]", term)) or term in self.all_operators:
-                check_state_one = not bool(re.search("[a-z]", copy_tokens[index - 1])) and not bool(re.search("[a-z]", copy_tokens[index + 1])) 
-                check_state_two = bool(re.search("[a-z]", copy_tokens[index - 1])) and not bool(re.search("[a-z]", copy_tokens[index + 1]))
+        right_terms = []
+        left_terms = []
+        right_terms_indeces = []
+        left_terms_indeces = []
+
+        for index, term in enumerate(self.tokens):
+            if  index < self.tokens.index(self.equal_sign):
                 if bool(re.search("[a-z]", term)):
-                    add_tokens_left.append(term)
-                    if left_indeces[0] == 0:
-                        left_indeces[0] = index
-                    else:
-                        left_indeces[1] = index
-                if not (check_state_one or check_state_two) and term != self.equal_sign and index < copy_tokens.index(self.equal_sign):
-                    add_tokens_left.append(term)
-                    if left_indeces[0] == 0:
-                        left_indeces[0] = index
-                    else:
-                        left_indeces[1] = index
-            if index > copy_tokens.index(self.equal_sign) and bool(re.search("[a-z]", term)) or term in self.all_operators:
-                check_state_one = not bool(re.search("[a-z]", copy_tokens[index - 1])) and not bool(re.search("[a-z]", copy_tokens[index + 1])) 
-                check_state_two = bool(re.search("[a-z]", copy_tokens[index - 1])) and not bool(re.search("[a-z]", copy_tokens[index + 1]))
+                    left_terms.append(term)
+                    left_terms_indeces.append(index)
+                elif term in self.all_operators and bool(re.search("[a-z]", self.tokens[index-1])) and bool(re.search("[a-z]", self.tokens[index+1])) or not bool(re.search("[a-z]", self.tokens[index-1])) and bool(re.search("[a-z]", self.tokens[index+1])):
+                    print("Divide")
+                    left_terms.append(term)
+                    left_terms_indeces.append(index)
+            if  index > self.tokens.index(self.equal_sign):
                 if bool(re.search("[a-z]", term)):
-                    add_tokens_right.append(term)
-                    if right_indeces[0] == 0:
-                        right_indeces[0] = index
-                    else:
-                        right_indeces[1] = index
-                if not (check_state_one or check_state_two) and term != self.equal_sign and index > copy_tokens.index(self.equal_sign):
-                    add_tokens_right.append(term)
-                    if right_indeces[0] == 0:
-                        right_indeces[0] = index
-                    else:
-                        right_indeces[1] = index
-        left_expression = ' '.join(add_tokens_left).replace(self.variable, "")
-        left_answer = str(eval(f"{str(left_expression)}"))  + self.variable
-        right_expression = ' '.join(add_tokens_right).replace(self.variable, "")
-        right_answer = str(eval(f"{str(right_expression)}")) + self.variable
-        copy_tokens = copy_tokens[:right_indeces[0]] + [str(right_answer)] + copy_tokens[right_indeces[1]+1:]
-        copy_tokens = [str(left_answer)] + copy_tokens[left_indeces[1]+1:]
+                    right_terms.append(term)
+                    right_terms_indeces.append(index)
+                elif term in self.all_operators and bool(re.search("[a-z]", self.tokens[index-1])) and bool(re.search("[a-z]", self.tokens[index+1])):
+                    print("Divide")
+                    right_terms.append(term)
+                    right_terms_indeces.append(index)
+                elif term in self.all_operators and not bool(re.search("[a-z]", self.tokens[index-1])) and bool(re.search("[a-z]", self.tokens[index+1])):
+                    print("Divid")
+                    right_terms.append(term)
+                    right_terms_indeces.append(index)
+
+        print("Left")
+        print(right_terms)
+        print(left_terms)
+        print(right_terms_indeces)
+        print(left_terms_indeces)
+        if (self.variable) in right_terms:
+            index = right_terms.index(self.variable)
+            right_terms[index] = "1" + self.variable
+        elif (self.variable) in left_terms:
+            index = left_terms.index(self.variable)
+            left_terms[index] = "1" + self.variable
+        if len(left_terms) > 2:
+            left_expression = ' '.join(left_terms).replace(self.variable, "")
+            left_answer = str(eval(f"{str(left_expression)}"))  + self.variable
+            copy_tokens = [str(left_answer)] + copy_tokens[left_indeces[1]+1:]
+
+        if len(right_terms) > 2:
+            right_expression = ' '.join(right_terms).replace(self.variable, "")
+            right_answer = str(eval(f"{str(right_expression)}")) + self.variable
+            print(right_answer)
+            copy_tokens = copy_tokens[:right_terms_indeces[0]] + [str(right_answer)] + copy_tokens[right_terms_indeces[-1]+1:]
+        
         self.tokens = copy_tokens
         self.fix_signs()
         
         step = f"Simplify algebraic terms"
 
         # Create a dictionary format for the solution in order to be parsed
-        solution = {
-            "equation": ' '.join(str(term) for term in old_tokens),
-            "step_count": str(self.step_count),
-            "step": step,
-            "change": "",
-            "step_equation":  ' '.join(str(term) for term in self.tokens),
-            "new_equation": ' '.join(str(term) for term in self.tokens)
-        }
-        self.solution_steps.append(solution)
-        self.step_count += 1
+        # solution = {
+        #     "equation": ' '.join(str(term) for term in old_tokens),
+        #     "step_count": str(self.step_count),
+        #     "step": step,
+        #     "change": "",
+        #     "step_equation":  ' '.join(str(term) for term in self.tokens),
+        #     "new_equation": ' '.join(str(term) for term in self.tokens)
+        # }
+        # self.solution_steps.append(solution)
+        # self.step_count += 1
 
     # count terms - variables and constants and the count of expressions
     def expression_classifier_count(self):
@@ -839,10 +851,6 @@ class Absoluver():
         print(self.solution_steps)
 
 if __name__ == '__main__':
-    test = ["-7x - 2 + 5 - (2x + 6 + 2x) = -21x -6 + 2 + 2x", "4x + 6 = 21", "7x - 2 = 21", "15x - 5 = 0", "6x + 2 + 26 = 4x + x", "4x = x + 6"]
-    # app.run(host='0.0.0.0', port=8080, debug=True)
-    # if len(sys.argv) == 1:
-    # elif sys.argv[2] == "dev":
-    instance = Absoluver(test[4])
-    instance.run()
+    # Run the program
+    app.run(host='0.0.0.0', port=8080, debug=True)
 
