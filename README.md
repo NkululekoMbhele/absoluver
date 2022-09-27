@@ -9,10 +9,10 @@
 
 There is a README files inside the backend and frontend directory on how to run the applcations
 
-## testing
+## Testing
 For testing all the necessary files are in the tests folder and README file is included to show how to test the application using unit test and integration test.
 
-# Implementation and Solution Strategy
+## Implementation and Solution Strategy
 
 * The application takes a a linear equation and splits it into tokens taken from the Machine Learning concept "Tokenization"
 * When the string equation is into tokens it is easy to manipulate and classify.
