@@ -8,10 +8,10 @@ function App() {
   const [equat, setEquat] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
   const [equation, setEquation] = useState("")
-  let url = "https://8080-cs-779307281603-default.cs-europe-west1-xedi.cloudshell.dev/"
-  fetch(`${url}`)
-  .then(data => data.json())
-  .then(data => console.log(data))
+  // let url = "https://8080-cs-779307281603-default.cs-europe-west1-xedi.cloudshell.dev/"
+  // fetch(`${url}`)
+  // .then(data => data.json())
+  // .then(data => console.log(data))
   const handleSubmit = async (e: React.ChangeEvent<any>) => {
     e.preventDefault()
     console.log(equation)
@@ -23,7 +23,7 @@ function App() {
     decodedEquation = decodedEquation.replace("(", "%28")
     decodedEquation = decodedEquation.replace(")", "%29")
     console.log(decodedEquation)
-    const response = await fetch(`http://localhost:5000/?equation=${decodedEquation}`)
+    const response = await fetch(`http://127.0.0.1:8080/?equation=${decodedEquation}`)
     const data = await response.json()
     console.log(data)
     setData(data)
@@ -50,7 +50,7 @@ function App() {
                       </button>
                 </div>
                 <h1 className="pt-2 text-red-400">{errorMessage}</h1>
-                <ChangeColor />
+                {/* <ChangeColor /> */}
               </form>
 
           </div>
