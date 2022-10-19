@@ -17,21 +17,11 @@ def index():
     equation = request.args.get('equation') or ''
     if len(equation) == 0:
         return json.dumps({"error": "No Equation found"})
-    print(equation)
     instance = Absoluver(equation)
     instance.run()
     solution_steps = instance.solution_steps
     return json.dumps({'steps': solution_steps, 'variable': instance.variable, 'equation': equation})
 
-@app.route('/test', methods=['GET', 'POST'])
-def test():
-    instance = Absoluver("2x + 3 = 4")
-    print(instance.equation_tokenization())
-    return json.dumps({'steps' : instance.equation_tokenization()})
-
-@app.route('/hello', methods=['GET', 'POST'])
-def test_hello():
-    return json.dumps({"steps" : "Hello World!"})
 
 
 class Absoluver():
