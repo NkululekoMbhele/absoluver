@@ -1,11 +1,11 @@
 # Unittest and Integration Test Guide
 
-## Available Scripts To Run The Application Local
+## Available Tests Scripts
 
 * integration_test.py
-    To run the integration tests cases which are writeen in integration_test.json
+    -To run the integration tests cases which are writeen in integration_test.json
 * unittest.py
-    To run the unit tests cases which are writeen in unittest_test.json
+    -To run the unit tests cases which are writeen in unittest_test.json
 
 
 <!-- # How tests are implemented? -->
