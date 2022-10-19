@@ -22,3 +22,8 @@ For testing all the necessary files are in the tests folder and README file is i
 ## Some Implementation Thought Which Is Not implemented
 
 * For the classification of equations the most efficient way of going about it is to use machine learning algorithms, to classify the equations and be able to pass the for operation.
+
+
+## Screenshot for solution of "2(4x + 3) + 6 = 24 - 4x" equation
+
+![Sample Screenshot](https://firebasestorage.googleapis.com/v0/b/nkululekoprojects-1353e.appspot.com/o/absoluver%2FScreenshot%202022-10-19%20195702.png?alt=media&token=5605029e-5ab3-4b1d-b269-9add8980286d)
