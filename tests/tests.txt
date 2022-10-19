@@ -1,0 +1,8 @@
+Test No.   Test Case            Test Input                Expected Output           Code Output               Result    
+1          simple               -x = 4                    x=-4                      x = -4                    fail      
+2          simple               x - 2 = 6                 x=8                       x = 8                     fail      
+3          simple               x = 6 + 5                 x=11                      x = 11                    fail      
+4          simple               -2x - 2 = 8               x=-5                      x = -5                    fail      
+5          simple               4x - 14 = 10              x=6                       x = 6                     fail      
+6          basic                2y - 2 + 5 = 4            y=1/2                     y = 1/2                   fail      
+7          basic                6 + 10x - 2 = 34          x=3                       x = 3                     fail      

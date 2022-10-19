@@ -1,16 +1,15 @@
-import unittest
+import json
+import sys
+sys.path.insert(1, '../backend')
+
+# Import the class
+from main import Absoluver
 
 
-class Testing(unittest.TestCase):
-    def test_string(self):
-        a = 'some'
-        b = 'some'
-        self.assertEqual(a, b)
+# Opening JSON file
+test_cases = open('./unittest_cases.json')
+  
+# returns JSON object as 
+# a dictionary
+data = json.load(test_cases)
 
-    def test_boolean(self):
-        a = True
-        b = True
-        self.assertEqual(a, b)
-
-if __name__ == '__main__':
-    unittest.main()

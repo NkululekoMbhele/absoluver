@@ -144,10 +144,7 @@ class Absoluver():
 
         # join signs
         for i, token in enumerate(self.tokens): 
-            if token == self.plus_sign and self.tokens[i-1] == self.equal_sign:
-                print(token)
             if token == self.minus_sign and self.tokens[i-1] == self.equal_sign and self.tokens[i+1] not in self.all_signs:
-                print(token)
                 self.tokens[i+1] = self.minus_sign + str(self.tokens[i+1])
                 self.tokens.pop(i)
         if no_sign_issue:
@@ -192,7 +189,7 @@ class Absoluver():
         step = f"Divide both sides by {factor}"
         new_tokens.append(self.equal_sign)
         if int(factor2) % int(factor) == 0:
-            answer = eval(f"{factor2} / {factor}")
+            answer = eval(f"{factor2} // {factor}")
         else:
             answer = (f"{factor2}/{factor}")
         new_tokens.append(answer)
@@ -276,20 +273,16 @@ class Absoluver():
 
         if self.variables == [1, 0] and self.constants == [0, 2] and len(self.tokens[0]) == 1:
             index = self.tokens.index(self.equal_sign)
-            print(self.tokens[index+1:])
             expression = " ".join(self.tokens[index+1:])
             new_answer = eval(expression)
             self.tokens = self.tokens[:index+1] + [str(new_answer)]
-            print(self.tokens)
             self.equation_state = "solution_case"
             step = "Simplify the right hand side"
         elif self.variables == [1, 0] and self.constants == [0, 2] and len(self.tokens[0]) == 2:
             index = self.tokens.index(self.equal_sign)
-            print(self.tokens[index+1:])
             expression = " ".join(self.tokens[index+1:])
             new_answer = eval(expression)
             self.tokens = self.tokens[:index+1] + [str(new_answer)]
-            print(self.tokens)
             self.equation_state = "base_case"
             step = "Simplify the right hand side"
         else:
@@ -387,13 +380,11 @@ class Absoluver():
         else:
             new_terms.pop(left_transpose_indeces[0])
 
-        print(left_transpose)
         if len(right_transpose) == 1 and left_transpose[0][0] != self.minus_sign:
             right_transpose = [self.minus_sign] + right_transpose
         elif len(right_transpose) == 1 and left_transpose[0][0] == self.minus_sign:
             right_transpose = [self.plus_sign] + right_transpose
 
-        print(right_transpose)
         # change signs left change
         if left_transpose[0] == self.minus_sign:
             left_transpose[0] = self.plus_sign
@@ -506,9 +497,6 @@ class Absoluver():
     def brackets_off_simplification(self):
         signs = ["+", "-", "*", "/"]
         eval_tokens, coefficient, position = self.parenthesis()
-        print(eval_tokens)
-        print(coefficient)
-        print(position)
         is_variable = False
         variable = ""
         old_tokens = self.tokens
@@ -532,8 +520,7 @@ class Absoluver():
             self.tokens[position[0]:position[1]] = new_tokens
         else:
             self.tokens[position[0]-1:position[1]] = new_tokens
-        print("tokens: ")
-        print(self.tokens)
+
 
         step = f"Distribution"
         self.fix_signs()
@@ -578,7 +565,6 @@ class Absoluver():
                         right_indeces[1] = index
                     add_tokens_right.append(term)
         left_answer = eval(f"{' '.join(add_tokens_left)}")
-        print(f"left answer {add_tokens_left}")
         if self.constants[1] > 1:
             right_answer = eval(f"{' '.join(add_tokens_right)}")
             copy_tokens = copy_tokens[:right_indeces[0]] + [str(right_answer)] + copy_tokens[right_indeces[1]+1:]
@@ -631,7 +617,6 @@ class Absoluver():
                     self.tokens.pop(i+1)
                     self.tokens.pop(i+1)
                     insert_index += 2
-        print(self.tokens)
         # Right hand side grouping  
         top_index = self.tokens.index(self.equal_sign) + 1
         insert_index = 0
@@ -648,7 +633,6 @@ class Absoluver():
                         insert_index -= 2
                         self.tokens.pop(i-1)
                         self.tokens.pop(i-1)     
-        print(self.tokens)
         step = f"Arrange and group like terms together"
         self.fix_signs()
 
@@ -685,7 +669,6 @@ class Absoluver():
                     left_terms.append(term)
                     left_terms_indeces.append(index)
                 elif term in self.all_operators and bool(re.search("[a-z]", self.tokens[index-1])) and bool(re.search("[a-z]", self.tokens[index+1])) or not bool(re.search("[a-z]", self.tokens[index-1])) and bool(re.search("[a-z]", self.tokens[index+1])):
-                    print("Divide")
                     left_terms.append(term)
                     left_terms_indeces.append(index)
             if  index > self.tokens.index(self.equal_sign):
@@ -693,19 +676,13 @@ class Absoluver():
                     right_terms.append(term)
                     right_terms_indeces.append(index)
                 elif term in self.all_operators and bool(re.search("[a-z]", self.tokens[index-1])) and bool(re.search("[a-z]", self.tokens[index+1])):
-                    print("Divide")
                     right_terms.append(term)
                     right_terms_indeces.append(index)
                 elif term in self.all_operators and not bool(re.search("[a-z]", self.tokens[index-1])) and bool(re.search("[a-z]", self.tokens[index+1])):
-                    print("Divid")
                     right_terms.append(term)
                     right_terms_indeces.append(index)
 
-        print("Left")
-        print(right_terms)
-        print(left_terms)
-        print(right_terms_indeces)
-        print(left_terms_indeces)
+
         if (self.variable) in right_terms:
             index = right_terms.index(self.variable)
             right_terms[index] = "1" + self.variable
@@ -720,7 +697,6 @@ class Absoluver():
         if len(right_terms) > 2:
             right_expression = ' '.join(right_terms).replace(self.variable, "")
             right_answer = str(eval(f"{str(right_expression)}")) + self.variable
-            print(right_answer)
             copy_tokens = copy_tokens[:right_terms_indeces[0]] + [str(right_answer)] + copy_tokens[right_terms_indeces[-1]+1:]
         
         self.tokens = copy_tokens
@@ -792,10 +768,6 @@ class Absoluver():
     # Check equation cases
     def check_cases(self):
         self.expression_classifier_count()
-        print(self.tokens)
-        print(self.variables)
-        print(self.constants)
-        print(self.parenthesis_pair)
         if self.parenthesis_pair[0] > 0 or self.parenthesis_pair[1] > 0:
             self.equation_state = "brackets_off_simplification"
         elif self.variables == [1, 0] and self.constants == [0, 1] and self.parenthesis_pair == [0, 0] and len(self.tokens[0]) != 1:
@@ -820,8 +792,6 @@ class Absoluver():
             self.equation_state = "terms_simplification"
 
     def terms_simplification(self):
-        print(self.variables)
-        print(self.constants)
         self.group_tokens()
         if self.variables == [1, 1] and self.constants == [2, 1]:
             self.equation_state = "terms_simplification"
@@ -840,7 +810,6 @@ class Absoluver():
         while len(self.final_solution) == 0:
             self.expression_classifier_count()
             self.check_cases()
-            print(self.equation_state)
             if self.equation_state == "brackets_off_simplification":
                 self.brackets_off_simplification()
             elif self.equation_state == "terms_simplification":
@@ -858,8 +827,6 @@ class Absoluver():
             else:
                 self.error_message = "Expression cannot be classified"
 
-        print("Hooray Solved")
-        print(self.solution_steps)
 
 if __name__ == '__main__':
     # Run the program
