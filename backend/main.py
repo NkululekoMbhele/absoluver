@@ -7,14 +7,16 @@ from nltk.tokenize import word_tokenize
 import sys
 
 app = Flask(__name__)
-cors = CORS(app)
+CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     solution_steps = []
     data = request.data
-    equation = request.args.get('equation')
+    equation = request.args.get('equation') or ''
+    if len(equation) == 0:
+        return json.dumps({"error": "No Equation found"})
     print(equation)
     instance = Absoluver(equation)
     instance.run()
@@ -25,11 +27,11 @@ def index():
 def test():
     instance = Absoluver("2x + 3 = 4")
     print(instance.equation_tokenization())
-    return json.dumps({steps : instance.equation_tokenization()})
+    return json.dumps({'steps' : instance.equation_tokenization()})
 
 @app.route('/hello', methods=['GET', 'POST'])
 def test_hello():
-    return json.dumps({steps : "Hello World!"})
+    return json.dumps({"steps" : "Hello World!"})
 
 
 class Absoluver():
@@ -189,8 +191,11 @@ class Absoluver():
 
         step = f"Divide both sides by {factor}"
         new_tokens.append(self.equal_sign)
-        answer = eval(f"{factor2} / {factor}")
-        new_tokens.append(round(answer, 2))
+        if int(factor2) % int(factor) == 0:
+            answer = eval(f"{factor2} / {factor}")
+        else:
+            answer = (f"{factor2}/{factor}")
+        new_tokens.append(answer)
 
         # Get the position of the equal sign
         position = self.tokens.index(self.equal_sign)
@@ -382,8 +387,12 @@ class Absoluver():
         else:
             new_terms.pop(left_transpose_indeces[0])
 
-        print("Transposes")
         print(left_transpose)
+        if len(right_transpose) == 1 and left_transpose[0][0] != self.minus_sign:
+            right_transpose = [self.minus_sign] + right_transpose
+        elif len(right_transpose) == 1 and left_transpose[0][0] == self.minus_sign:
+            right_transpose = [self.plus_sign] + right_transpose
+
         print(right_transpose)
         # change signs left change
         if left_transpose[0] == self.minus_sign:
@@ -807,6 +816,8 @@ class Absoluver():
             self.equation_state = "terms_simplification"
         elif self.variables > [1, 1] and self.constants > [1, 0] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "terms_simplification"
+        elif self.variables >= [1, 0] and self.constants >= [1, 1] and self.parenthesis_pair == [0, 0]:
+            self.equation_state = "terms_simplification"
 
     def terms_simplification(self):
         print(self.variables)
@@ -853,4 +864,5 @@ class Absoluver():
 if __name__ == '__main__':
     # Run the program
     app.run(host='0.0.0.0', port=8080, debug=True)
+    
 
