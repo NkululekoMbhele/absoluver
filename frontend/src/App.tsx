@@ -8,10 +8,8 @@ function App() {
   const [equat, setEquat] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
   const [equation, setEquation] = useState("")
-  // let url = "https://8080-cs-779307281603-default.cs-europe-west1-xedi.cloudshell.dev/"
-  // fetch(`${url}`)
-  // .then(data => data.json())
-  // .then(data => console.log(data))
+
+  // Handle Form Submission
   const handleSubmit = async (e: React.ChangeEvent<any>) => {
     e.preventDefault()
     console.log(equation)
