@@ -1,8 +1,87 @@
 {
     "test_cases": [{
-        "test_number": 1,
-        "test_case": "basic",
-        "test_input": "-x = 4",
-        "expected_output": "x=4"
-    }]
+            "test_number": 1,
+            "test_case": "Tokenisation instance equation",
+            "description": "Split an equation string to tokens (array elements)",
+            "test_input": "7x - 2 = 21",
+            "expected_output": "['7x', '-', '2', '=', '21']"
+        },
+        {
+            "test_number": 2,
+            "test_case": "Tokenisation function",
+            "description": "Split any given equation string to tokens (array elements)",
+            "test_input": "2x - 2",
+            "expected_output": "['2x', '-', '2']"
+        },
+        {
+            "test_number": 3,
+            "test_case": "Expression term count",
+            "description": "Count variables, constants, and paranthesis pair in the form e.g Variables [1, 0] -> Means -> 1 found on the left hand side and none on the right hand side",
+            "test_input": "7x - 2 = 21",
+            "expected_output": "[1, 0], [1, 1], [0, 0]"
+        },
+        {
+            "test_number": 4,
+            "test_case": "Check cases",
+            "description": "classify the case for the equation based on the expression count details",
+            "test_input": "7x - 2 = 21",
+            "expected_output": "simple base case"
+        },
+        {
+            "test_number": 5,
+            "test_case": "Simple Base Case Method",
+            "description": "Transpose simplification",
+            "test_input": "7x - 2 = 21",
+            "expected_output": "7x = 23"
+        },
+        {
+            "test_number": 6,
+            "test_case": "Base case coefficient",
+            "description": "Divide both sides for removal of coefficient",
+            "test_input": "7x = 23",
+            "expected_output": "7x = 23/7"
+        },
+        {
+            "test_number": 7,
+            "test_case": "Bracket off function",
+            "description": "Remove brackets by distribution",
+            "test_input": "2(4x + 3) + 6 = 24 - 4x",
+            "expected_output": "8x + 6 +6 = 24 - 4x"
+        },
+        {
+            "test_number": 8,
+            "test_case": "Term grouping",
+            "description": "Grouping like terms together for easy simplification",
+            "test_input": "2x + 3 + 4x = 24 - 6x",
+            "expected_output": "2x + 4x + 3 = 24 - 6x"
+        },
+        {
+            "test_number": 9,
+            "test_case": "Expression simplification",
+            "description": "Averall simplification of like terms by adding/subtracting like terms",
+            "test_input": "8x + 6 + 6 = 24 - 4x + 2x",
+            "expected_output": "8x + 12 = 24 - 2x"
+        },
+        {
+            "test_number": 10,
+            "test_case": "Algebraic Simplification",
+            "description": "Simplift all algebraic operations",
+            "test_input": "8x + 6x + 2 = 24 - 4x",
+            "expected_output": "14x + 2 = 24 - 4x"
+        },
+        {
+            "test_number": 11,
+            "test_case": "Numerical Simplification",
+            "description": "Simplify constants in the equation",
+            "test_input": "8x + 6 + 8 + 6 = 20",
+            "expected_output": "8x + 20 = 20"
+        },
+        {
+            "test_number": 12,
+            "test_case": "Fix a broken expression",
+            "description": "Fix signs if they are incorrectly positioned after operations",
+            "test_input": "8x - + 2 = 24 - 4",
+            "expected_output": "8x - 2 = 24 - 4"
+        }
+    ]
 }
