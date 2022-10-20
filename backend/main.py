@@ -341,6 +341,8 @@ class Absoluver():
         left_transpose = []
         left_transpose_indeces = []
         popped = 0
+        print(self.variables)
+        print(self.contants)
 
         # Traverse through each token
         for index, term in enumerate(self.tokens):
@@ -771,6 +773,10 @@ class Absoluver():
         elif self.variables == [1, 0] and self.constants == [0, 2] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "simplification_base_case"
         elif self.variables == [1, 1] and self.constants == [1, 1] and self.parenthesis_pair == [0, 0]:
+            self.equation_state = "terms_arrangement"
+        elif self.variables == [1, 1] and self.constants == [1, 0] and self.parenthesis_pair == [0, 0]:
+            self.equation_state = "terms_arrangement"
+        elif self.variables == [1, 1] and self.constants == [0, 1] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "terms_arrangement"
         elif self.variables >= [2, 2] and self.constants >= [2, 2] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "terms_simplification"
