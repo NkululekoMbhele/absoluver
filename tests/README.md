@@ -36,18 +36,18 @@ python unittest.py
 
 |Test Number   | Test Case  |  Input | Expected Output  |
 | --- | --- | --- | --- | ---|
-|  1  | Tokenisation instance equation  | 8x - + 2 = 24 - 4  | ['7x', '-', '2', '=', '21'] |
-|  2  | Tokenisation function  | 8x + 6 + 8 + 6 = 20  | ['2x', '-', '2'] |
-|  3  | Expression term count  | 8x + 6x + 2 = 24 - 4x  | [1, 0], [1, 1], [0, 0] |
+|  1  | Tokenisation instance equation  | 7x - 2 = 21  | ['7x', '-', '2', '=', '21'] |
+|  2  | Tokenisation function  |  2x - 2  | ['2x', '-', '2'] |
+|  3  | Expression term count  | 7x - 2 = 21  | [1, 0], [1, 1], [0, 0] |
 |  4  | Check cases  | 7x - 2 = 21  | simple base case |
-|  5  | Simple Base Case Method  | 8x + 6 + 6 = 24 - 4x + 2x  | 7x = 23 |
-|  6  | Base case coefficient  | 2x - 2  | 7x = 23/7 |
-|  7  | Bracket off function  | 2x + 3 + 4x = 24 - 6x  | 8x + 6 +6 = 24 - 4x |
-|  8  | Term grouping  | 7x - 2 = 21  | 2x + 4x + 3 = 24 - 6x |
-|  9  | Expression simplification  | 2(4x + 3) + 6 = 24 - 4x  | 8x + 12 = 24 - 2x |
-|  10 | Algebraic Simplification  | 7x - 2 = 21  | 14x + 2 = 24 - 4x |
-|  11 | Numerical Simplification  | 7x = 23  | 8x + 20 = 20 |
-|  12 | Fix a broken expression  | 7x - 2 = 21  | 8x - 2 = 24 - 4 |
+|  5  | Simple Base Case Method  | 7x - 2 = 21  | 7x = 23 |
+|  6  | Base case coefficient  | 7x = 23 | x = 23/7 |
+|  7  | Bracket off function  | 2(4x + 3) + 6 = 24 - 4x | 8x + 6 +6 = 24 - 4x |
+|  8  | Term grouping  |  2x + 3 + 4x = 24 - 6x   | 2x + 4x + 3 = 24 - 6x |
+|  9  | Expression simplification  | 8x + 6 + 6 = 24 - 4x + 2x   | 8x + 12 = 24 - 2x |
+|  10 | Algebraic Simplification  | 8x + 6x + 2 = 24 - 4x   | 14x + 2 = 24 - 4x |
+|  11 | Numerical Simplification  | 8x + 6 + 8 + 6 = 20  | 8x + 20 = 20 |
+|  12 | Fix a broken expression  | 8x - + 2 = 24 - 4  | 8x - 2 = 24 - 4 |
 
 ### Integration Tests Cases
 

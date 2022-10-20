@@ -16,7 +16,10 @@ data = json.load(test_cases)
 
 
 def compare_results(code_output, expected_output):
-    pass
+    test_result = "fail"
+    if code_output == expected_output or (code_output.replace(" ", "")) == expected_output or code_output.lower() == expected_output.lower() :
+        test_result = "pass"
+    return test_result
 
 
 print("{:<10} {:<20} {:<25} {:<25} {:<25} {:<10}".format('Test No.','Test Case','Test Input','Expected Output', 'Code Output', 'Result'))
@@ -26,10 +29,8 @@ for case in data['test_cases']:
     instance.run()
     results = instance.solution_steps
     code_output = results[-1]['new_equation']
-    test_result = "fail"
-    if code_output == case["expected_output"]:
-        print("pass")
-        test_result = "pass"
+    test_result = compare_results(code_output, case["expected_output"])
+
 
     print("{:<10} {:<20} {:<25} {:<25} {:<25} {:<10}".format(case["test_number"], case["test_case"], case["test_input"],case["expected_output"], code_output, test_result)) 
   

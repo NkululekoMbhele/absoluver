@@ -1,14 +1,14 @@
 {
     "test_cases": [{
             "test_number": 1,
-            "test_case": "Tokenisation instance equation",
+            "test_case": "Tokenization instance equation",
             "description": "Split an equation string to tokens (array elements)",
             "test_input": "7x - 2 = 21",
             "expected_output": "['7x', '-', '2', '=', '21']"
         },
         {
             "test_number": 2,
-            "test_case": "Tokenisation function",
+            "test_case": "Tokenization function",
             "description": "Split any given equation string to tokens (array elements)",
             "test_input": "2x - 2",
             "expected_output": "['2x', '-', '2']"
