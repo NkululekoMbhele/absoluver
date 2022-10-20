@@ -787,6 +787,7 @@ class Absoluver():
         elif self.variables >= [1, 0] and self.constants >= [1, 1] and self.parenthesis_pair == [0, 0]:
             self.equation_state = "terms_simplification"
 
+    # Simplification controller method
     def terms_simplification(self):
         self.group_tokens()
         if self.variables == [1, 1] and self.constants == [2, 1]:
