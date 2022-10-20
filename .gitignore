@@ -1,5 +1,6 @@
 /__pycache__
 tests/__pycache__
+tests/test.py
 backend/venv
 /frontend/node_modules
 frontend/build
