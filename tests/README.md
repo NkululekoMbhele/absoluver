@@ -15,42 +15,44 @@
 
 
 
-<!-- ## How to run tests? -->
+## How to run tests?
+
+To run the integration tests
+
+Run
+bash`
+python integration_test.py
+`
+
+To run the unit tests
+
+Run
+bash`
+python unittest.py
+`
 
 
-<!-- # Tests Samples Results -->
+### Unit Tests
 
-<!-- ### Unit Tests -->
-<!-- 
-|Test Number   	| Test Case  	|  Input 	| Expected Output  	|  Results 	|
-|---	|---	|---	|---	|---	|
-|  1 	| simple 	| 2x + 4 = 10  	| x = 0  	| fail  	|
-|  2 	| simple 	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  3 	| simple 	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  4 	| simple 	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  5 	| simple 	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  6 	| simple 	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  7 	| simple 	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  8 	| simple 	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  9 	| simple 	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  10 	| simple 	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  11	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  12	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  13	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  14 	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  15	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  16	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  17	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  18	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  19	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-|  20	| complex  	| 2x + 4 = 10  	| x = 0 	| fail  	|
-
- -->
+|Test Number   | Test Case  |  Input | Expected Output  |
+| --- | --- | --- | --- | ---|
+|  1  | Tokenisation instance equation  | 8x - + 2 = 24 - 4  | ['7x', '-', '2', '=', '21'] |
+|  2  | Tokenisation function  | 8x + 6 + 8 + 6 = 20  | ['2x', '-', '2'] |
+|  3  | Expression term count  | 8x + 6x + 2 = 24 - 4x  | [1, 0], [1, 1], [0, 0] |
+|  4  | Check cases  | 7x - 2 = 21  | simple base case |
+|  5  | Simple Base Case Method  | 8x + 6 + 6 = 24 - 4x + 2x  | 7x = 23 |
+|  6  | Base case coefficient  | 2x - 2  | 7x = 23/7 |
+|  7  | Bracket off function  | 2x + 3 + 4x = 24 - 6x  | 8x + 6 +6 = 24 - 4x |
+|  8  | Term grouping  | 7x - 2 = 21  | 2x + 4x + 3 = 24 - 6x |
+|  9  | Expression simplification  | 2(4x + 3) + 6 = 24 - 4x  | 8x + 12 = 24 - 2x |
+|  10 | Algebraic Simplification  | 7x - 2 = 21  | 14x + 2 = 24 - 4x |
+|  11 | Numerical Simplification  | 7x = 23  | 8x + 20 = 20 |
+|  12 | Fix a broken expression  | 7x - 2 = 21  | 8x - 2 = 24 - 4 |
 
 ### Integration Tests Cases
 
 | Test Number | Test Case | Input Equation | Expected Output |  
-| ---	| ---	| ---	| ---	| 
+| --- | --- | --- | --- |
 | 1 | simple | -x = 4 | x=-4 |
 | 2 | simple | x - 2 = 6 | x=8 |
 | 3 | simple | x = 6 + 5 | x=11 |
@@ -71,5 +73,3 @@
 | 18 | complex | 7x + 2(3x + 4x - 2) = 10(4 + x) |  x=7/8 |
 | 19 | complex | 5x + 4(4x - 8x + 2) = 21x+6 | x=1/16 |
 | 20 | complex | 2(4x + 3) + 6 = 24 -4x | x=1 |
-
-
