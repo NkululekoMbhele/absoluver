@@ -35,7 +35,7 @@ python unittest.py
 ### Unit Tests
 
 |Test Number   | Test Case  |  Input | Expected Output  |
-| --- | --- | --- | --- | ---|
+| --- | --- | --- | --- |
 |  1  | Tokenisation instance equation  | 7x - 2 = 21  | ['7x', '-', '2', '=', '21'] |
 |  2  | Tokenisation function  |  2x - 2  | ['2x', '-', '2'] |
 |  3  | Expression term count  | 7x - 2 = 21  | [1, 0], [1, 1], [0, 0] |
